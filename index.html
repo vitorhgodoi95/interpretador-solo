@@ -3,435 +3,681 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RW Insumos — Interpretador de Análise de Solo</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>RW Insumos — Sistema Agronômico</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #f4f1eb;
-  --bg2: #edeae2;
-  --surface: #ffffff;
-  --border: #d8d4c8;
-  --border2: #c8c3b5;
-  --text: #1a1a18;
-  --text2: #5a5a52;
-  --text3: #8a8a80;
-  --green: #2d6a4f;
-  --green-light: #e8f5ee;
-  --green-mid: #52b788;
-  --amber: #b5580a;
-  --amber-light: #fef3e2;
-  --red: #9b2226;
-  --red-light: #fdecea;
-  --blue: #1d4e89;
-  --blue-light: #e8f0fb;
-  --accent: #2d6a4f;
-  --mono: 'DM Mono', monospace;
-  --sans: 'DM Sans', sans-serif;
+:root{
+  --bg:#f4f1eb;--bg2:#edeae2;--surface:#fff;--border:#d8d4c8;--border2:#c8c3b5;
+  --text:#1a1a18;--text2:#5a5a52;--text3:#9a9a90;
+  --green:#2d6a4f;--green-l:#e8f5ee;--green-m:#52b788;
+  --amber:#b5580a;--amber-l:#fef3e2;
+  --red:#9b2226;--red-l:#fdecea;
+  --blue:#1d4e89;--blue-l:#e8f0fb;
+  --purple:#5c3d8f;--purple-l:#f0eafa;
+  --accent:#2d6a4f;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+.hdr{background:var(--text);color:#fff;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-logo{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.08em}
+.hdr-logo span{color:#52b788}
+.hdr-right{display:flex;align-items:center;gap:.75rem}
+.api-wrap{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.08);border-radius:6px;padding:.3rem .6rem}
+.api-wrap label{font-size:11px;color:rgba(255,255,255,.5);font-family:var(--mono);white-space:nowrap}
+.api-wrap input{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:12px;color:#fff;width:200px}
+.api-toggle{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.4);font-size:11px;padding:2px 5px;border-radius:3px;font-family:var(--mono)}
+.api-toggle:hover{color:#fff}
 
-/* HEADER */
-.header{background:var(--text);color:#fff;padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.header-logo{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.08em;opacity:.9}
-.header-logo span{color:var(--green-mid)}
-.header-title{font-size:13px;color:rgba(255,255,255,.5);font-weight:300}
+/* NAV MODULES */
+.mod-nav{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem}
+.mod-btn{padding:.75rem 1.25rem;font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;font-family:var(--sans);transition:all .15s;display:flex;align-items:center;gap:.4rem}
+.mod-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.mod-btn:hover:not(.active){color:var(--text)}
+.mod-dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.6}
 
 /* LAYOUT */
-.main{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 56px)}
-.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:1.5rem;overflow-y:auto;max-height:calc(100vh - 56px);position:sticky;top:56px}
-.content{padding:2rem;overflow-y:auto}
-
-/* SECTIONS */
-.section-label{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
-
-/* API KEY */
-.api-bar{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem}
-.api-bar input{flex:1;border:none;background:transparent;font-family:var(--mono);font-size:12px;color:var(--text);outline:none}
-.api-bar label{font-size:11px;color:var(--text3);white-space:nowrap;font-family:var(--mono)}
-.api-toggle{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;padding:2px 6px;border-radius:4px}
-.api-toggle:hover{background:var(--border)}
+.layout{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 96px)}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:1.25rem;overflow-y:auto;max-height:calc(100vh - 96px);position:sticky;top:96px}
+.main{padding:1.75rem;overflow-y:auto}
 
 /* FORM */
-.form-group{margin-bottom:1rem}
-.form-group label{display:block;font-size:12px;color:var(--text2);margin-bottom:.35rem;font-weight:500}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:.5rem .75rem;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:13px;color:var(--text);background:var(--surface);transition:border .15s;outline:none}
-.form-group input:focus,.form-group select:focus{border-color:var(--accent)}
-.form-group textarea{resize:vertical;min-height:60px;font-family:var(--mono);font-size:12px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+.sec-lbl{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+.fg{display:flex;flex-direction:column;gap:3px;margin-bottom:.65rem}
+.fg label{font-size:11px;color:var(--text2);font-weight:500}
+.fg input,.fg select,.fg textarea{width:100%;padding:.45rem .65rem;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:13px;color:var(--text);background:var(--surface);outline:none;transition:border .15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent)}
+.fg textarea{font-family:var(--mono);font-size:11px;resize:vertical;min-height:50px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.5rem}
 
-/* TABS */
-.tabs{display:flex;gap:2px;margin-bottom:1.5rem;background:var(--bg2);border-radius:8px;padding:3px}
-.tab-btn{flex:1;padding:.45rem;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;border-radius:6px;color:var(--text2);transition:all .15s;font-family:var(--sans)}
-.tab-btn.active{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
-
-/* BTN */
-.btn-primary{width:100%;padding:.75rem;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans);letter-spacing:.02em;transition:opacity .15s;margin-top:.5rem}
-.btn-primary:hover{opacity:.88}
-.btn-primary:disabled{opacity:.4;cursor:not-allowed}
-.btn-sec{padding:.5rem 1rem;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:all .15s}
+/* BUTTONS */
+.btn-primary{width:100%;padding:.7rem;background:var(--accent);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:opacity .15s;margin-top:.5rem}
+.btn-primary:hover{opacity:.87}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-sec{padding:.45rem .9rem;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:all .15s}
 .btn-sec:hover{border-color:var(--accent);color:var(--accent)}
+.btn-upload{width:100%;padding:.65rem;background:transparent;color:var(--text2);border:1.5px dashed var(--border2);border-radius:7px;font-size:13px;cursor:pointer;font-family:var(--sans);transition:all .15s;margin-bottom:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.btn-upload:hover{border-color:var(--accent);color:var(--accent);background:var(--green-l)}
 
 /* CARDS */
-.result-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1rem}
-.result-card h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1rem;font-family:var(--mono);letter-spacing:.04em}
+.rcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:1rem}
+.rcard-title{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.06em;color:var(--text3);text-transform:uppercase;margin-bottom:1rem}
 
-/* PARAM TABLE */
-.param-table{width:100%;border-collapse:collapse}
-.param-table th{font-size:11px;font-weight:500;color:var(--text3);text-align:left;padding:.4rem .6rem;border-bottom:1px solid var(--border);font-family:var(--mono);letter-spacing:.05em}
-.param-table td{padding:.55rem .6rem;border-bottom:1px solid var(--bg2);font-size:13px;vertical-align:top}
-.param-table tr:last-child td{border-bottom:none}
-.param-name{font-weight:500;color:var(--text);min-width:80px}
-.param-val{font-family:var(--mono);font-size:12px;color:var(--text2)}
-.param-int{font-size:12px;color:var(--text2);line-height:1.5}
+/* TABLES */
+.ptable{width:100%;border-collapse:collapse}
+.ptable th{font-size:10px;font-weight:500;color:var(--text3);text-align:left;padding:.4rem .5rem;border-bottom:1px solid var(--border);font-family:var(--mono);letter-spacing:.05em}
+.ptable td{padding:.5rem .5rem;border-bottom:1px solid var(--bg2);font-size:12px;vertical-align:top}
+.ptable tr:last-child td{border-bottom:none}
+.ptable tr:hover td{background:var(--bg2)}
 
 /* BADGES */
-.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;font-family:var(--mono);letter-spacing:.04em;white-space:nowrap}
-.badge-baixo{background:var(--blue-light);color:var(--blue)}
-.badge-medio{background:var(--amber-light);color:var(--amber)}
-.badge-adequado{background:var(--green-light);color:var(--green)}
-.badge-alto{background:#fff3cd;color:#856404}
-.badge-excesso{background:var(--red-light);color:var(--red)}
+.bdg{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;font-family:var(--mono);letter-spacing:.03em;white-space:nowrap}
+.bdg-baixo{background:var(--blue-l);color:var(--blue)}
+.bdg-medio{background:var(--amber-l);color:var(--amber)}
+.bdg-adequado{background:var(--green-l);color:var(--green)}
+.bdg-alto{background:#fff3cd;color:#856404}
+.bdg-excesso{background:var(--red-l);color:var(--red)}
+.bdg-deficiente{background:var(--red-l);color:var(--red)}
+.bdg-normal{background:var(--green-l);color:var(--green)}
+.bdg-excessivo{background:var(--purple-l);color:var(--purple)}
 
-/* CALAGEM */
-.cal-table{width:100%;border-collapse:collapse}
-.cal-table tr td{padding:.5rem .6rem;border-bottom:1px solid var(--bg2);font-size:13px}
-.cal-table tr:last-child td{border-bottom:none}
-.cal-table td:first-child{color:var(--text2);font-size:12px;width:55%}
-.cal-table td:last-child{font-weight:600;font-family:var(--mono);font-size:13px;text-align:right}
-.cal-note{background:var(--green-light);border-left:3px solid var(--green-mid);border-radius:0 6px 6px 0;padding:.75rem 1rem;font-size:12px;color:var(--green);margin-top:.75rem;line-height:1.6}
-
-/* ADUBACAO */
-.adub-item{padding:.75rem 0;border-bottom:1px solid var(--bg2)}
-.adub-item:last-child{border-bottom:none}
-.adub-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.25rem}
-.adub-el{font-family:var(--mono);font-weight:600;font-size:14px;color:var(--text)}
-.adub-dose{font-family:var(--mono);font-size:12px;color:var(--text2)}
-.adub-detail{font-size:12px;color:var(--text3);line-height:1.5}
+/* DRIS BARS */
+.dris-bar-wrap{display:flex;align-items:center;gap:.5rem;margin-top:2px}
+.dris-bar-bg{flex:1;height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;position:relative}
+.dris-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+.dris-val{font-family:var(--mono);font-size:11px;min-width:45px;text-align:right}
 
 /* OBS */
-.obs-item{padding:.65rem .9rem;border-radius:6px;font-size:13px;margin-bottom:.5rem;line-height:1.5;border-left:3px solid}
-.obs-critico{background:var(--red-light);border-color:var(--red);color:var(--red)}
-.obs-alerta{background:var(--amber-light);border-color:var(--amber);color:var(--amber)}
-.obs-ok{background:var(--green-light);border-color:var(--green-mid);color:var(--green)}
+.obs{padding:.6rem .85rem;border-radius:6px;font-size:12px;margin-bottom:.4rem;line-height:1.5;border-left:3px solid}
+.obs-c{background:var(--red-l);border-color:var(--red);color:var(--red)}
+.obs-a{background:var(--amber-l);border-color:var(--amber);color:var(--amber)}
+.obs-o{background:var(--green-l);border-color:var(--green-m);color:var(--green)}
 
-/* EMPTY / LOADING */
+/* EMPTY / LOAD */
 .empty{text-align:center;padding:4rem 2rem;color:var(--text3)}
-.empty-icon{font-size:48px;margin-bottom:1rem;opacity:.3}
-.empty p{font-size:14px;line-height:1.7}
-.loading{text-align:center;padding:3rem;color:var(--text2)}
-.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+.empty svg{width:48px;height:48px;margin:0 auto 1rem;opacity:.25;display:block}
+.empty p{font-size:13px;line-height:1.8}
+.spin-wrap{text-align:center;padding:3rem}
+.spinner{width:28px;height:28px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto .75rem}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* CAL TABLE */
+.ctbl{width:100%;border-collapse:collapse}
+.ctbl td{padding:.5rem .5rem;border-bottom:1px solid var(--bg2);font-size:12px}
+.ctbl td:first-child{color:var(--text2);width:55%}
+.ctbl td:last-child{font-weight:600;font-family:var(--mono);text-align:right}
+.ctbl tr:last-child td{border-bottom:none}
+.cal-note{background:var(--green-l);border-left:3px solid var(--green-m);border-radius:0 6px 6px 0;padding:.65rem .9rem;font-size:12px;color:var(--green);margin-top:.65rem;line-height:1.6}
+
+/* ADUB */
+.adub-item{padding:.6rem 0;border-bottom:1px solid var(--bg2)}
+.adub-item:last-child{border-bottom:none}
+.adub-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.15rem}
+.adub-el{font-family:var(--mono);font-weight:600;font-size:13px}
+.adub-dose{font-family:var(--mono);font-size:11px;color:var(--text2)}
+.adub-det{font-size:11px;color:var(--text3);line-height:1.4}
+
 /* NOTA */
-.nota{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:.65rem 1rem;font-size:11px;color:var(--text3);margin-top:1rem;font-family:var(--mono);line-height:1.6}
+.nota{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:.6rem .9rem;font-size:10px;color:var(--text3);margin-top:.75rem;font-family:var(--mono);line-height:1.7}
 
-/* AMOSTRA INFO */
-.amostra-info{background:var(--bg2);border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--text2);display:none}
-.amostra-info strong{color:var(--text);display:block;font-size:13px;margin-bottom:.2rem}
-
-/* HISTORY */
-.hist-item{padding:.6rem .75rem;background:var(--bg2);border-radius:6px;margin-bottom:.4rem;cursor:pointer;font-size:12px;display:flex;justify-content:space-between;align-items:center;border:1px solid transparent}
-.hist-item:hover{border-color:var(--border2)}
-.hist-item .hi-name{font-weight:500;color:var(--text)}
-.hist-item .hi-meta{color:var(--text3);font-size:11px;font-family:var(--mono)}
+/* UPLOAD STATUS */
+.upload-status{font-size:11px;color:var(--green);font-family:var(--mono);padding:.35rem .65rem;background:var(--green-l);border-radius:5px;margin-bottom:.65rem;display:none}
 
 /* PRINT */
-@media print {
-  .sidebar,.header,.btn-primary,.btn-sec,.tabs{display:none}
-  .content{padding:0}
-  .result-card{border:1px solid #ccc;page-break-inside:avoid}
-}
+@media print{.hdr,.mod-nav,.sidebar,.btn-primary,.btn-sec{display:none}.main{padding:0}.rcard{border:1px solid #ccc;page-break-inside:avoid}}
 
 /* RESPONSIVE */
-@media(max-width:768px){
-  .main{grid-template-columns:1fr}
+@media(max-width:800px){
+  .layout{grid-template-columns:1fr}
   .sidebar{position:static;max-height:none;border-right:none;border-bottom:1px solid var(--border)}
-  .content{padding:1rem}
-  .grid3{grid-template-columns:1fr 1fr}
+  .g4{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-logo">RW <span>///</span> INSUMOS</div>
-  <div class="header-title">Interpretador de Análise de Solo · Boletim 100 IAC</div>
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-logo">RW <span>///</span> INSUMOS &nbsp;<span style="opacity:.3">|</span>&nbsp; <span style="font-weight:300;font-size:12px;opacity:.6">Sistema Agronômico</span></div>
+  <div class="hdr-right">
+    <div class="api-wrap">
+      <label>API</label>
+      <input type="password" id="apikey" placeholder="sk-ant-••••••••••••" autocomplete="off">
+      <button class="api-toggle" onclick="toggleKey()">ver</button>
+    </div>
+    <button class="btn-sec" onclick="window.print()" style="color:rgba(255,255,255,.6);border-color:rgba(255,255,255,.2)">Imprimir</button>
+  </div>
 </div>
 
-<div class="main">
-
-<!-- SIDEBAR -->
-<div class="sidebar">
-
-  <div class="section-label">Chave API</div>
-  <div class="api-bar" style="margin-bottom:1.5rem">
-    <label>sk-ant</label>
-    <input type="password" id="apikey" placeholder="••••••••••••••••••••" autocomplete="off">
-    <button class="api-toggle" onclick="toggleKey()">mostrar</button>
-  </div>
-
-  <div class="tabs" style="margin-bottom:1.5rem">
-    <button class="tab-btn active" onclick="switchTab('manual')">Manual</button>
-    <button class="tab-btn" onclick="switchTab('historico')">Histórico</button>
-  </div>
-
-  <!-- TAB MANUAL -->
-  <div id="tab-manual">
-    <div class="section-label">Identificação</div>
-    <div class="form-group"><label>Propriedade</label><input type="text" id="prop" placeholder="Ex: Sítio São João"></div>
-    <div class="form-group"><label>Quadra / Amostra</label><input type="text" id="quad" placeholder="Ex: Quadra Cima"></div>
-    <div class="grid2" style="margin-bottom:1rem">
-      <div class="form-group" style="margin:0"><label>Cultura</label>
-        <select id="cultura">
-          <option value="">Selecione...</option>
-          <option>Cana-de-açúcar</option><option>Soja</option><option>Milho</option>
-          <option>Café</option><option>Tomate</option><option>Batata</option>
-          <option>Feijão</option><option>Citros</option><option>Pastagem</option>
-          <option>Hortaliças folhosas</option><option>Mandioca</option>
-        </select>
-      </div>
-      <div class="form-group" style="margin:0"><label>Área (ha)</label><input type="number" id="area" value="1" min="0.1" step="0.1"></div>
-    </div>
-    <div class="form-group"><label>Textura</label>
-      <select id="textura">
-        <option value="argiloso">Argiloso (>35% argila)</option>
-        <option value="médio">Médio (15–35%)</option>
-        <option value="arenoso">Arenoso (<15%)</option>
-      </select>
-    </div>
-
-    <div class="section-label" style="margin-top:1rem">Reação do solo</div>
-    <div class="grid3">
-      <div class="form-group" style="margin:0"><label>pH CaCl₂</label><input type="number" id="ph" step="0.1" placeholder="4.3"></div>
-      <div class="form-group" style="margin:0"><label>pH SMP</label><input type="number" id="phsmp" step="0.1" placeholder="5.7"></div>
-      <div class="form-group" style="margin:0"><label>V%</label><input type="number" id="v" step="0.1" placeholder="30"></div>
-    </div>
-    <div class="grid3" style="margin-top:.75rem">
-      <div class="form-group" style="margin:0"><label>Al (mmolc)</label><input type="number" id="al" step="0.1" placeholder="5"></div>
-      <div class="form-group" style="margin:0"><label>Ac.Total</label><input type="number" id="actt" step="0.1" placeholder="56"></div>
-      <div class="form-group" style="margin:0"><label>Sat.Al%</label><input type="number" id="satal" step="0.1" placeholder="16.9"></div>
-    </div>
-
-    <div class="section-label" style="margin-top:1rem">Macronutrientes</div>
-    <div class="grid3">
-      <div class="form-group" style="margin:0"><label>Ca (mmolc)</label><input type="number" id="ca" step="0.1" placeholder="15"></div>
-      <div class="form-group" style="margin:0"><label>Mg (mmolc)</label><input type="number" id="mg" step="0.1" placeholder="7"></div>
-      <div class="form-group" style="margin:0"><label>K (mmolc)</label><input type="number" id="k" step="0.1" placeholder="2.4"></div>
-    </div>
-    <div class="grid3" style="margin-top:.75rem">
-      <div class="form-group" style="margin:0"><label>CTC</label><input type="number" id="ctc" step="0.1" placeholder="80.5"></div>
-      <div class="form-group" style="margin:0"><label>SB</label><input type="number" id="sb" step="0.1" placeholder="24.5"></div>
-      <div class="form-group" style="margin:0"><label>P (mg/dm³)</label><input type="number" id="p" step="0.1" placeholder="15"></div>
-    </div>
-    <div class="grid2" style="margin-top:.75rem">
-      <div class="form-group" style="margin:0"><label>MO (g/dm³)</label><input type="number" id="mo" step="0.1" placeholder="24"></div>
-      <div class="form-group" style="margin:0"><label>S (mg/dm³)</label><input type="number" id="s" step="0.1" placeholder="32"></div>
-    </div>
-
-    <div class="section-label" style="margin-top:1rem">Micronutrientes (mg/dm³)</div>
-    <div class="grid3">
-      <div class="form-group" style="margin:0"><label>Zn</label><input type="number" id="zn" step="0.1" placeholder="1.5"></div>
-      <div class="form-group" style="margin:0"><label>B</label><input type="number" id="b" step="0.1" placeholder="0.7"></div>
-      <div class="form-group" style="margin:0"><label>Cu</label><input type="number" id="cu" step="0.1" placeholder="2.6"></div>
-    </div>
-    <div class="grid2" style="margin-top:.75rem">
-      <div class="form-group" style="margin:0"><label>Mn</label><input type="number" id="mn" step="0.1" placeholder="5.4"></div>
-      <div class="form-group" style="margin:0"><label>Fe</label><input type="number" id="fe" step="0.1" placeholder="40"></div>
-    </div>
-
-    <button class="btn-primary" onclick="interpretar()" id="btn-int">Interpretar análise</button>
-  </div>
-
-  <!-- TAB HISTORICO -->
-  <div id="tab-historico" style="display:none">
-    <div class="section-label">Interpretações salvas</div>
-    <div id="hist-list"><p style="font-size:13px;color:var(--text3)">Nenhuma interpretação salva ainda.</p></div>
-    <button class="btn-sec" style="width:100%;margin-top:1rem" onclick="limparHistorico()">Limpar histórico</button>
-  </div>
-
+<!-- MODULE NAV -->
+<div class="mod-nav">
+  <button class="mod-btn active" onclick="setMod('solo')" id="mod-solo"><div class="mod-dot"></div>Análise de Solo</button>
+  <button class="mod-btn" onclick="setMod('foliar')" id="mod-foliar"><div class="mod-dot"></div>Análise Foliar</button>
+  <button class="mod-btn" onclick="setMod('dris')" id="mod-dris"><div class="mod-dot"></div>DRIS</button>
 </div>
 
-<!-- CONTENT -->
-<div class="content" id="content">
+<!-- LAYOUT -->
+<div class="layout">
+<div class="sidebar" id="sidebar-content"></div>
+<div class="main" id="main-content">
   <div class="empty" id="empty-state">
-    <div class="empty-icon">🌱</div>
-    <p>Preencha os dados da análise de solo<br>e clique em <strong>Interpretar análise</strong><br>para gerar o laudo agronômico.</p>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+    <p>Selecione um módulo acima,<br>preencha os dados e clique em <strong>Interpretar</strong><br>para gerar o laudo agronômico.</p>
   </div>
 </div>
-
 </div>
 
 <script>
-// ---- UTILS ----
-function g(id){ return document.getElementById(id).value.trim(); }
-function toggleKey(){
-  const inp = document.getElementById('apikey');
-  const btn = inp.nextElementSibling;
-  inp.type = inp.type==='password'?'text':'password';
-  btn.textContent = inp.type==='password'?'mostrar':'ocultar';
+// ============================================================
+// UTILS
+// ============================================================
+function toggleKey(){const i=document.getElementById('apikey');const b=i.nextElementSibling;i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'ver':'ocultar'}
+function g(id){const el=document.getElementById(id);return el?el.value.trim():''}
+function apiKey(){return document.getElementById('apikey').value.trim()}
+function showLoading(){document.getElementById('main-content').innerHTML='<div class="spin-wrap"><div class="spinner"></div><p style="font-size:13px;color:var(--text2)">Interpretando com base na literatura agronômica...</p></div>'}
+function setMain(html){document.getElementById('main-content').innerHTML=html}
+function fmtDate(){return new Date().toLocaleDateString('pt-BR')}
+
+// ============================================================
+// MODULE NAVIGATION
+// ============================================================
+let currentMod = 'solo';
+function setMod(m){
+  currentMod=m;
+  document.querySelectorAll('.mod-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('mod-'+m).classList.add('active');
+  renderSidebar(m);
+  setMain('<div class="empty" id="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg><p>Preencha os dados e clique em <strong>Interpretar</strong>.</p></div>');
 }
-function switchTab(t){
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===(t==='manual'?0:1)));
-  document.getElementById('tab-manual').style.display = t==='manual'?'block':'none';
-  document.getElementById('tab-historico').style.display = t==='historico'?'block':'none';
-  if(t==='historico') renderHistorico();
+
+// ============================================================
+// SIDEBAR RENDER
+// ============================================================
+function renderSidebar(m){
+  const cultura_opts = ['Cana-de-açúcar','Soja','Milho','Café','Tomate','Batata','Feijão','Citros','Pastagem','Hortaliças folhosas','Mandioca'];
+  const co = cultura_opts.map(c=>`<option>${c}</option>`).join('');
+  const textura_opts = `<option value="argiloso">Argiloso (>35%)</option><option value="médio">Médio (15–35%)</option><option value="arenoso">Arenoso (<15%)</option>`;
+
+  if(m==='solo'){
+    document.getElementById('sidebar-content').innerHTML=`
+<div class="sec-lbl">Upload PDF</div>
+<button class="btn-upload" onclick="document.getElementById('pdf-input').click()">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  Carregar PDF do laboratório
+</button>
+<input type="file" id="pdf-input" accept=".pdf" style="display:none" onchange="handlePDF(this)">
+<div class="upload-status" id="upload-status"></div>
+
+<div class="sec-lbl">Identificação</div>
+<div class="fg"><label>Propriedade</label><input type="text" id="prop" placeholder="Ex: Sítio São João"></div>
+<div class="fg"><label>Quadra / Amostra</label><input type="text" id="quad" placeholder="Ex: Quadra Cima"></div>
+<div class="g2">
+  <div class="fg"><label>Cultura</label><select id="cultura"><option value="">Selecione...</option>${co}</select></div>
+  <div class="fg"><label>Área (ha)</label><input type="number" id="area" value="1" min="0.1" step="0.1"></div>
+</div>
+<div class="fg"><label>Textura</label><select id="textura">${textura_opts}</select></div>
+
+<div class="sec-lbl" style="margin-top:.75rem">Reação do solo</div>
+<div class="g3">
+  <div class="fg"><label>pH CaCl₂</label><input type="number" id="ph" step="0.1" placeholder="4.3"></div>
+  <div class="fg"><label>pH SMP</label><input type="number" id="phsmp" step="0.1" placeholder="5.7"></div>
+  <div class="fg"><label>V%</label><input type="number" id="v" step="0.1" placeholder="30"></div>
+</div>
+<div class="g3">
+  <div class="fg"><label>Al (mmolc)</label><input type="number" id="al" step="0.1" placeholder="5"></div>
+  <div class="fg"><label>Ac.Total</label><input type="number" id="actt" step="0.1" placeholder="56"></div>
+  <div class="fg"><label>Sat.Al%</label><input type="number" id="satal" step="0.1" placeholder="16.9"></div>
+</div>
+
+<div class="sec-lbl" style="margin-top:.75rem">Macronutrientes</div>
+<div class="g3">
+  <div class="fg"><label>Ca (mmolc)</label><input type="number" id="ca" step="0.1" placeholder="15"></div>
+  <div class="fg"><label>Mg (mmolc)</label><input type="number" id="mg" step="0.1" placeholder="7"></div>
+  <div class="fg"><label>K (mmolc)</label><input type="number" id="k" step="0.1" placeholder="2.4"></div>
+</div>
+<div class="g3">
+  <div class="fg"><label>CTC</label><input type="number" id="ctc" step="0.1" placeholder="80.5"></div>
+  <div class="fg"><label>SB</label><input type="number" id="sb" step="0.1" placeholder="24.5"></div>
+  <div class="fg"><label>P (mg/dm³)</label><input type="number" id="p" step="0.1" placeholder="15"></div>
+</div>
+<div class="g2">
+  <div class="fg"><label>MO (g/dm³)</label><input type="number" id="mo" step="0.1" placeholder="24"></div>
+  <div class="fg"><label>S (mg/dm³)</label><input type="number" id="s" step="0.1" placeholder="32"></div>
+</div>
+
+<div class="sec-lbl" style="margin-top:.75rem">Micronutrientes (mg/dm³)</div>
+<div class="g3">
+  <div class="fg"><label>Zn</label><input type="number" id="zn" step="0.1" placeholder="1.5"></div>
+  <div class="fg"><label>B</label><input type="number" id="b" step="0.1" placeholder="0.7"></div>
+  <div class="fg"><label>Cu</label><input type="number" id="cu" step="0.1" placeholder="2.6"></div>
+</div>
+<div class="g2">
+  <div class="fg"><label>Mn</label><input type="number" id="mn" step="0.1" placeholder="5.4"></div>
+  <div class="fg"><label>Fe</label><input type="number" id="fe" step="0.1" placeholder="40"></div>
+</div>
+<button class="btn-primary" onclick="interpretarSolo()" id="btn-solo">Interpretar análise de solo</button>`;
+  }
+
+  else if(m==='foliar'){
+    document.getElementById('sidebar-content').innerHTML=`
+<div class="sec-lbl">Upload PDF</div>
+<button class="btn-upload" onclick="document.getElementById('pdf-foliar').click()">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  Carregar PDF foliar
+</button>
+<input type="file" id="pdf-foliar" accept=".pdf" style="display:none" onchange="handlePDFFoliar(this)">
+<div class="upload-status" id="upload-status-foliar"></div>
+
+<div class="sec-lbl">Identificação</div>
+<div class="fg"><label>Propriedade</label><input type="text" id="f-prop" placeholder="Ex: Sítio São João"></div>
+<div class="fg"><label>Talhão / Amostra</label><input type="text" id="f-talh" placeholder="Ex: Talhão 3"></div>
+<div class="g2">
+  <div class="fg"><label>Cultura</label><select id="f-cultura"><option value="">Selecione...</option>${co}</select></div>
+  <div class="fg"><label>Estádio</label><input type="text" id="f-estadio" placeholder="Ex: V6, R1, floração"></div>
+</div>
+
+<div class="sec-lbl" style="margin-top:.75rem">Macronutrientes (g/kg)</div>
+<div class="g3">
+  <div class="fg"><label>N</label><input type="number" id="f-n" step="0.1" placeholder="30"></div>
+  <div class="fg"><label>P</label><input type="number" id="f-p" step="0.1" placeholder="2.5"></div>
+  <div class="fg"><label>K</label><input type="number" id="f-k" step="0.1" placeholder="20"></div>
+</div>
+<div class="g3">
+  <div class="fg"><label>Ca</label><input type="number" id="f-ca" step="0.1" placeholder="10"></div>
+  <div class="fg"><label>Mg</label><input type="number" id="f-mg" step="0.1" placeholder="3"></div>
+  <div class="fg"><label>S</label><input type="number" id="f-s" step="0.1" placeholder="2"></div>
+</div>
+
+<div class="sec-lbl" style="margin-top:.75rem">Micronutrientes (mg/kg)</div>
+<div class="g3">
+  <div class="fg"><label>B</label><input type="number" id="f-b" step="0.1" placeholder="30"></div>
+  <div class="fg"><label>Cu</label><input type="number" id="f-cu" step="0.1" placeholder="10"></div>
+  <div class="fg"><label>Fe</label><input type="number" id="f-fe" step="0.1" placeholder="100"></div>
+</div>
+<div class="g3">
+  <div class="fg"><label>Mn</label><input type="number" id="f-mn" step="0.1" placeholder="50"></div>
+  <div class="fg"><label>Zn</label><input type="number" id="f-zn" step="0.1" placeholder="20"></div>
+  <div class="fg"><label>Mo</label><input type="number" id="f-mo" step="0.01" placeholder="0.5"></div>
+</div>
+<button class="btn-primary" onclick="interpretarFoliar()" id="btn-foliar">Interpretar análise foliar</button>`;
+  }
+
+  else if(m==='dris'){
+    document.getElementById('sidebar-content').innerHTML=`
+<div class="sec-lbl">Upload PDF</div>
+<button class="btn-upload" onclick="document.getElementById('pdf-dris').click()">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  Carregar PDF foliar para DRIS
+</button>
+<input type="file" id="pdf-dris" accept=".pdf" style="display:none" onchange="handlePDFDris(this)">
+<div class="upload-status" id="upload-status-dris"></div>
+
+<div class="sec-lbl">Identificação</div>
+<div class="fg"><label>Propriedade</label><input type="text" id="d-prop" placeholder="Ex: Fazenda Boa Vista"></div>
+<div class="fg"><label>Talhão / Amostra</label><input type="text" id="d-talh" placeholder="Ex: Quadra 2"></div>
+<div class="g2">
+  <div class="fg"><label>Cultura</label><select id="d-cultura"><option value="">Selecione...</option>${co}</select></div>
+  <div class="fg"><label>Produtividade esperada</label><select id="d-prod"><option value="média">Média</option><option value="alta">Alta</option><option value="muito alta">Muito alta</option></select></div>
+</div>
+
+<div class="sec-lbl" style="margin-top:.75rem">Teores foliares (g/kg, exceto micro mg/kg)</div>
+<div class="g3">
+  <div class="fg"><label>N (g/kg)</label><input type="number" id="d-n" step="0.1" placeholder="30"></div>
+  <div class="fg"><label>P (g/kg)</label><input type="number" id="d-p" step="0.1" placeholder="2.5"></div>
+  <div class="fg"><label>K (g/kg)</label><input type="number" id="d-k" step="0.1" placeholder="20"></div>
+</div>
+<div class="g3">
+  <div class="fg"><label>Ca (g/kg)</label><input type="number" id="d-ca" step="0.1" placeholder="10"></div>
+  <div class="fg"><label>Mg (g/kg)</label><input type="number" id="d-mg" step="0.1" placeholder="3"></div>
+  <div class="fg"><label>S (g/kg)</label><input type="number" id="d-s" step="0.1" placeholder="2"></div>
+</div>
+<div class="g3">
+  <div class="fg"><label>B (mg/kg)</label><input type="number" id="d-b" step="0.1" placeholder="30"></div>
+  <div class="fg"><label>Cu (mg/kg)</label><input type="number" id="d-cu" step="0.1" placeholder="10"></div>
+  <div class="fg"><label>Fe (mg/kg)</label><input type="number" id="d-fe" step="0.1" placeholder="100"></div>
+</div>
+<div class="g3">
+  <div class="fg"><label>Mn (mg/kg)</label><input type="number" id="d-mn" step="0.1" placeholder="50"></div>
+  <div class="fg"><label>Zn (mg/kg)</label><input type="number" id="d-zn" step="0.1" placeholder="20"></div>
+  <div class="fg"><label>Mo (mg/kg)</label><input type="number" id="d-mo" step="0.01" placeholder="0.5"></div>
+</div>
+<button class="btn-primary" onclick="interpretarDRIS()" id="btn-dris">Calcular DRIS</button>`;
+  }
 }
 
-// ---- HISTORICO ----
-function getHistorico(){ return JSON.parse(localStorage.getItem('rw_historico')||'[]'); }
-function salvarHistorico(item){ const h=getHistorico(); h.unshift(item); localStorage.setItem('rw_historico',JSON.stringify(h.slice(0,20))); }
-function limparHistorico(){ if(confirm('Limpar todo o histórico?')){ localStorage.removeItem('rw_historico'); renderHistorico(); } }
-function renderHistorico(){
-  const h=getHistorico();
-  const el=document.getElementById('hist-list');
-  if(!h.length){ el.innerHTML='<p style="font-size:13px;color:var(--text3)">Nenhuma interpretação salva ainda.</p>'; return; }
-  el.innerHTML=h.map((item,i)=>`<div class="hist-item" onclick="loadHistorico(${i})">
-    <div><div class="hi-name">${item.prop||'Sem nome'} · ${item.quad||''}</div><div class="hi-meta">${item.cultura} · ${item.data}</div></div>
-    <div class="hi-meta">Ver</div>
-  </div>`).join('');
-}
-function loadHistorico(i){ const h=getHistorico(); if(h[i]) renderResult(h[i].result, h[i].area, h[i].cultura, h[i].prop, h[i].quad); switchTab('manual'); }
-
-// ---- INTERPRETAR ----
-function interpretar(){
-  const apikey = document.getElementById('apikey').value.trim();
-  if(!apikey){ alert('Insira sua chave de API Anthropic.'); return; }
-  const cultura = g('cultura');
-  if(!cultura){ alert('Selecione a cultura.'); return; }
-  if(!g('ph') && !g('ca') && !g('p')){ alert('Preencha ao menos pH, Ca e P.'); return; }
-
-  const area = parseFloat(g('area'))||1;
-  const textura = g('textura');
-  const prop = g('prop')||'Não informado';
-  const quad = g('quad')||'Amostra';
-
-  const s = {
-    ph:g('ph'),phsmp:g('phsmp'),v:g('v'),al:g('al'),actt:g('actt'),satal:g('satal'),
-    ca:g('ca'),mg:g('mg'),k:g('k'),ctc:g('ctc'),sb:g('sb'),
-    p:g('p'),mo:g('mo'),s:g('s'),zn:g('zn'),b:g('b'),cu:g('cu'),mn:g('mn'),fe:g('fe')
-  };
-
-  document.getElementById('empty-state') && (document.getElementById('empty-state').style.display='none');
-  document.getElementById('content').innerHTML = `<div class="loading"><div class="spinner"></div><p>Interpretando com base no Boletim 100 do IAC...</p></div>`;
-  document.getElementById('btn-int').disabled = true;
-
-  const prompt = `Você é engenheiro agrônomo especialista em fertilidade do solo. Use o Boletim Técnico 100 do IAC (Raij et al., 1997/2008) como referência. Cultura: ${cultura}. Textura: ${textura}. Área: ${area} ha.
-
-ANÁLISE — ${prop} · ${quad}:
-pH CaCl2: ${s.ph} | pH SMP: ${s.phsmp} | V%: ${s.v}% | Sat.Al: ${s.satal}%
-Ca: ${s.ca} | Mg: ${s.mg} | K: ${s.k} mmolc/dm³
-CTC: ${s.ctc} | SB: ${s.sb} mmolc/dm³ | Al: ${s.al} | Acidez total: ${s.actt} mmolc/dm³
-P resina: ${s.p} mg/dm³ | MO: ${s.mo} g/dm³ | S: ${s.s} mg/dm³
-Zn: ${s.zn} | B: ${s.b} | Cu: ${s.cu} | Mn: ${s.mn} | Fe: ${s.fe} mg/dm³
-
-Retorne SOMENTE JSON válido sem markdown:
-{"diagnostico":[{"parametro":"pH","valor":"${s.ph}","unidade":"","status":"baixo","interpretacao":"texto breve"},{"parametro":"Ca","valor":"${s.ca}","unidade":"mmolc/dm³","status":"baixo","interpretacao":"texto"},{"parametro":"Mg","valor":"${s.mg}","unidade":"mmolc/dm³","status":"baixo","interpretacao":"texto"},{"parametro":"K","valor":"${s.k}","unidade":"mmolc/dm³","status":"medio","interpretacao":"texto"},{"parametro":"V%","valor":"${s.v}","unidade":"%","status":"baixo","interpretacao":"texto"},{"parametro":"P","valor":"${s.p}","unidade":"mg/dm³","status":"medio","interpretacao":"texto"},{"parametro":"MO","valor":"${s.mo}","unidade":"g/dm³","status":"medio","interpretacao":"texto"},{"parametro":"S","valor":"${s.s}","unidade":"mg/dm³","status":"adequado","interpretacao":"texto"},{"parametro":"Zn","valor":"${s.zn}","unidade":"mg/dm³","status":"baixo","interpretacao":"texto"},{"parametro":"B","valor":"${s.b}","unidade":"mg/dm³","status":"baixo","interpretacao":"texto"},{"parametro":"Cu","valor":"${s.cu}","unidade":"mg/dm³","status":"adequado","interpretacao":"texto"},{"parametro":"Mn","valor":"${s.mn}","unidade":"mg/dm³","status":"adequado","interpretacao":"texto"}],"calagem":{"necessaria":true,"vcalc":70,"ncal_tha":2.5,"ncal_total":${area*2.5},"prnt_referencia":70,"produto_sugerido":"Calcário dolomítico","metodo":"SMP","observacao":"texto"},"adubacao":{"N":{"dose_kgha":20,"total_kg":${area*20},"fonte_sugerida":"Ureia","parcelamento":"texto"},"P2O5":{"dose_kgha":80,"total_kg":${area*80},"fonte_sugerida":"Superfosfato simples","parcelamento":"texto"},"K2O":{"dose_kgha":80,"total_kg":${area*80},"fonte_sugerida":"KCl","parcelamento":"texto"},"S":{"dose_kgha":0,"total_kg":0,"fonte_sugerida":"Não necessário","parcelamento":"texto"},"Zn":{"dose_kgha":2,"total_kg":${area*2},"fonte_sugerida":"Sulfato de zinco","parcelamento":"texto"},"B":{"dose_kgha":0.5,"total_kg":${area*0.5},"fonte_sugerida":"Bórax","parcelamento":"texto"}},"observacoes":[{"nivel":"critico","texto":"obs crítica"},{"nivel":"alerta","texto":"obs alerta"},{"nivel":"ok","texto":"obs positiva"}]}
-
-Preencha com valores reais baseados na análise e no Boletim 100 IAC. Status válidos: baixo, medio, adequado, alto, excesso.`;
-
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apikey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-client-side-allow-unsafe': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
-      system: 'Responda APENAS com JSON válido. Sem markdown, sem texto fora do JSON, sem vírgula final.',
-      messages: [{ role: 'user', content: prompt }]
-    })
-  })
-  .then(r => r.json())
-  .then(data => {
-    document.getElementById('btn-int').disabled = false;
-    if(data.error){ alert('Erro API: ' + data.error.message); document.getElementById('content').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><p>'+data.error.message+'</p></div>'; return; }
-    const raw = data.content[0].text.replace(/```json|```/g,'').trim();
-    const res = JSON.parse(raw);
-    salvarHistorico({prop,quad,cultura,area,result:res,data:new Date().toLocaleDateString('pt-BR')});
-    renderResult(res, area, cultura, prop, quad);
-  })
-  .catch(e => {
-    document.getElementById('btn-int').disabled = false;
-    alert('Erro de conexão. Verifique sua chave de API e tente novamente.\n\n' + e.message);
-    document.getElementById('content').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><p>Erro de conexão.</p></div>';
+// ============================================================
+// PDF HANDLING — envia como base64 para Claude extrair
+// ============================================================
+async function pdfToBase64(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result.split(',')[1]);
+    r.onerror=rej;
+    r.readAsDataURL(file);
   });
 }
 
-// ---- RENDER ----
-function renderResult(res, area, cultura, prop, quad){
-  const bmap = {baixo:'badge-baixo',medio:'badge-medio',adequado:'badge-adequado',alto:'badge-alto',excesso:'badge-excesso'};
-  const cal = res.calagem;
-  const adub = res.adubacao;
+async function handlePDF(input){
+  const file=input.files[0]; if(!file) return;
+  const key=apiKey();
+  if(!key){alert('Insira sua chave API primeiro.');return;}
+  const st=document.getElementById('upload-status');
+  st.style.display='block'; st.textContent='Lendo PDF...';
+  try{
+    const b64=await pdfToBase64(file);
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-client-side-allow-unsafe':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:800,
+        system:'Extraia dados de análise de solo deste relatório de laboratório. Retorne SOMENTE JSON válido sem markdown.',
+        messages:[{role:'user',content:[
+          {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
+          {type:'text',text:'Extraia todos os valores desta análise de solo. Retorne JSON: {"prop":"nome da propriedade","quad":"identificação da quadra/amostra","ph":0,"phsmp":0,"v":0,"al":0,"actt":0,"satal":0,"ca":0,"mg":0,"k":0,"ctc":0,"sb":0,"p":0,"mo":0,"s":0,"zn":0,"b":0,"cu":0,"mn":0,"fe":0}. Use null para valores não encontrados.'}
+        ]}]
+      })
+    });
+    const data=await resp.json();
+    if(data.error){st.textContent='Erro: '+data.error.message;return;}
+    const raw=data.content[0].text.replace(/```json|```/g,'').trim();
+    const vals=JSON.parse(raw);
+    preencherSolo(vals);
+    st.textContent='✓ PDF lido — '+file.name;
+  }catch(e){st.textContent='Erro ao ler PDF: '+e.message;}
+}
 
-  const diagHTML = `
-    <div class="result-card">
-      <h3>DIAGNÓSTICO — ${prop} · ${quad} · ${cultura.toUpperCase()}</h3>
-      <table class="param-table">
-        <thead><tr><th>Parâmetro</th><th>Resultado</th><th>Status</th><th>Interpretação</th></tr></thead>
-        <tbody>${res.diagnostico.map(d=>`<tr>
-          <td class="param-name">${d.parametro}</td>
-          <td class="param-val">${d.valor??'nd'} ${d.unidade}</td>
-          <td><span class="badge ${bmap[d.status]||'badge-medio'}">${d.status}</span></td>
-          <td class="param-int">${d.interpretacao}</td>
-        </tr>`).join('')}</tbody>
-      </table>
-    </div>`;
+function preencherSolo(v){
+  const map={prop:'prop',quad:'quad',ph:'ph',phsmp:'phsmp',v:'v',al:'al',actt:'actt',satal:'satal',ca:'ca',mg:'mg',k:'k',ctc:'ctc',sb:'sb',p:'p',mo:'mo',s:'s',zn:'zn',b:'b',cu:'cu',mn:'mn',fe:'fe'};
+  Object.entries(map).forEach(([key,id])=>{
+    const el=document.getElementById(id);
+    if(el && v[key]!==null && v[key]!==undefined) el.value=v[key];
+  });
+}
 
-  const calHTML = `
-    <div class="result-card">
-      <h3>NECESSIDADE DE CALAGEM</h3>
-      ${cal.necessaria ? `
-      <table class="cal-table">
-        <tr><td>Método</td><td>${cal.metodo}</td></tr>
-        <tr><td>V% alvo para ${cultura}</td><td>${cal.vcalc}%</td></tr>
-        <tr><td>NC calculada</td><td>${cal.ncal_tha} t/ha</td></tr>
-        <tr><td>NC total (${area} ha)</td><td>${Number(cal.ncal_total).toFixed(1)} t</td></tr>
-        <tr><td>PRNT de referência</td><td>${cal.prnt_referencia}%</td></tr>
-        <tr><td>Produto sugerido</td><td>${cal.produto_sugerido}</td></tr>
-      </table>
-      <div class="cal-note">${cal.observacao}</div>` :
-      `<div class="obs-item obs-ok">Solo não requer calagem para esta cultura nas condições avaliadas.</div>`}
-    </div>`;
+async function handlePDFFoliar(input){
+  const file=input.files[0]; if(!file) return;
+  const key=apiKey();
+  if(!key){alert('Insira sua chave API primeiro.');return;}
+  const st=document.getElementById('upload-status-foliar');
+  st.style.display='block'; st.textContent='Lendo PDF foliar...';
+  try{
+    const b64=await pdfToBase64(file);
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-client-side-allow-unsafe':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:600,
+        system:'Extraia dados de análise foliar. Retorne SOMENTE JSON válido sem markdown.',
+        messages:[{role:'user',content:[
+          {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
+          {type:'text',text:'Extraia os teores foliares. Retorne JSON: {"prop":"","talh":"","cultura":"","estadio":"","n":0,"p":0,"k":0,"ca":0,"mg":0,"s":0,"b":0,"cu":0,"fe":0,"mn":0,"zn":0,"mo":0}. N,P,K,Ca,Mg,S em g/kg; micro em mg/kg. null para não encontrados.'}
+        ]}]
+      })
+    });
+    const data=await resp.json();
+    if(data.error){st.textContent='Erro: '+data.error.message;return;}
+    const raw=data.content[0].text.replace(/```json|```/g,'').trim();
+    const vals=JSON.parse(raw);
+    preencherFoliar(vals);
+    st.textContent='✓ PDF lido — '+file.name;
+  }catch(e){st.textContent='Erro: '+e.message;}
+}
 
-  const adubHTML = `
-    <div class="result-card">
-      <h3>ADUBAÇÃO RECOMENDADA · ${area} ha</h3>
-      ${Object.entries(adub).map(([el,v])=>`
-      <div class="adub-item">
-        <div class="adub-header">
-          <span class="adub-el">${el}</span>
-          <span class="adub-dose">${v.dose_kgha} kg/ha &nbsp;·&nbsp; ${Number(v.total_kg).toFixed(0)} kg total</span>
-        </div>
-        <div class="adub-detail">Fonte: ${v.fonte_sugerida} &nbsp;·&nbsp; ${v.parcelamento}</div>
-      </div>`).join('')}
-    </div>`;
+function preencherFoliar(v){
+  const map={prop:'f-prop',talh:'f-talh',cultura:'f-cultura',estadio:'f-estadio',n:'f-n',p:'f-p',k:'f-k',ca:'f-ca',mg:'f-mg',s:'f-s',b:'f-b',cu:'f-cu',fe:'f-fe',mn:'f-mn',zn:'f-zn',mo:'f-mo'};
+  Object.entries(map).forEach(([key,id])=>{
+    const el=document.getElementById(id);
+    if(el && v[key]!==null && v[key]!==undefined) el.value=v[key];
+  });
+}
 
-  const obsHTML = `
-    <div class="result-card">
-      <h3>OBSERVAÇÕES AGRONÔMICAS</h3>
-      ${res.observacoes.map(o=>{
-        const cls = o.nivel==='critico'?'obs-critico':o.nivel==='alerta'?'obs-alerta':'obs-ok';
-        return `<div class="obs-item ${cls}">${o.texto}</div>`;
-      }).join('')}
-    </div>`;
+async function handlePDFDris(input){
+  const file=input.files[0]; if(!file) return;
+  const key=apiKey();
+  if(!key){alert('Insira sua chave API primeiro.');return;}
+  const st=document.getElementById('upload-status-dris');
+  st.style.display='block'; st.textContent='Lendo PDF para DRIS...';
+  try{
+    const b64=await pdfToBase64(file);
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-client-side-allow-unsafe':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:600,
+        system:'Extraia dados de análise foliar para DRIS. Retorne SOMENTE JSON válido.',
+        messages:[{role:'user',content:[
+          {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
+          {type:'text',text:'Extraia os teores foliares. Retorne JSON: {"prop":"","talh":"","cultura":"","n":0,"p":0,"k":0,"ca":0,"mg":0,"s":0,"b":0,"cu":0,"fe":0,"mn":0,"zn":0,"mo":0}. N,P,K,Ca,Mg,S em g/kg; micro em mg/kg. null para não encontrados.'}
+        ]}]
+      })
+    });
+    const data=await resp.json();
+    if(data.error){st.textContent='Erro: '+data.error.message;return;}
+    const raw=data.content[0].text.replace(/```json|```/g,'').trim();
+    const vals=JSON.parse(raw);
+    preencherDris(vals);
+    st.textContent='✓ PDF lido — '+file.name;
+  }catch(e){st.textContent='Erro: '+e.message;}
+}
 
-  const notaHTML = `<div class="nota">Laudo gerado com base no Boletim 100 do IAC (Raij et al., 1997/2008). As recomendações devem ser validadas pelo engenheiro agrônomo responsável pela propriedade. RW Insumos e Consultoria · ${new Date().toLocaleDateString('pt-BR')}</div>`;
+function preencherDris(v){
+  const map={prop:'d-prop',talh:'d-talh',cultura:'d-cultura',n:'d-n',p:'d-p',k:'d-k',ca:'d-ca',mg:'d-mg',s:'d-s',b:'d-b',cu:'d-cu',fe:'d-fe',mn:'d-mn',zn:'d-zn',mo:'d-mo'};
+  Object.entries(map).forEach(([key,id])=>{
+    const el=document.getElementById(id);
+    if(el && v[key]!==null && v[key]!==undefined) el.value=v[key];
+  });
+}
 
-  document.getElementById('content').innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+// ============================================================
+// SOLO
+// ============================================================
+function interpretarSolo(){
+  const key=apiKey(); if(!key){alert('Insira sua chave API.');return;}
+  const cultura=g('cultura'); if(!cultura){alert('Selecione a cultura.');return;}
+  if(!g('ph')&&!g('ca')&&!g('p')){alert('Preencha ao menos pH, Ca e P.');return;}
+  const area=parseFloat(g('area'))||1;
+  const s={ph:g('ph'),phsmp:g('phsmp'),v:g('v'),al:g('al'),actt:g('actt'),satal:g('satal'),ca:g('ca'),mg:g('mg'),k:g('k'),ctc:g('ctc'),sb:g('sb'),p:g('p'),mo:g('mo'),s:g('s'),zn:g('zn'),b:g('b'),cu:g('cu'),mn:g('mn'),fe:g('fe')};
+  const prop=g('prop')||'Não informado'; const quad=g('quad')||'Amostra';
+  document.getElementById('btn-solo').disabled=true; showLoading();
+
+  const prompt=`Engenheiro agrônomo. Use Boletim 100 IAC (Raij et al. 1997/2008). Cultura: ${cultura}. Textura: ${g('textura')}. Área: ${area} ha. Propriedade: ${prop} — ${quad}.
+ANÁLISE SOLO: pH CaCl2: ${s.ph} | pH SMP: ${s.phsmp} | V%: ${s.v}% | Sat.Al: ${s.satal}%
+Ca: ${s.ca} | Mg: ${s.mg} | K: ${s.k} mmolc/dm³ | CTC: ${s.ctc} | SB: ${s.sb} | Al: ${s.al} | Ac.Total: ${s.actt}
+P: ${s.p} mg/dm³ | MO: ${s.mo} g/dm³ | S: ${s.s} mg/dm³ | Zn: ${s.zn} | B: ${s.b} | Cu: ${s.cu} | Mn: ${s.mn} | Fe: ${s.fe} mg/dm³
+Retorne SOMENTE JSON: {"diagnostico":[{"parametro":"pH","valor":"${s.ph}","unidade":"","status":"baixo","interpretacao":"texto"}],"calagem":{"necessaria":true,"vcalc":70,"ncal_tha":2.5,"ncal_total":${area*2.5},"prnt_referencia":70,"produto_sugerido":"Calcário dolomítico","metodo":"SMP","observacao":"texto"},"adubacao":{"N":{"dose_kgha":20,"total_kg":${area*20},"fonte_sugerida":"Ureia","parcelamento":"texto"},"P2O5":{"dose_kgha":80,"total_kg":${area*80},"fonte_sugerida":"Superfosfato simples","parcelamento":"texto"},"K2O":{"dose_kgha":80,"total_kg":${area*80},"fonte_sugerida":"KCl","parcelamento":"texto"},"S":{"dose_kgha":0,"total_kg":0,"fonte_sugerida":"Não necessário","parcelamento":"—"},"Zn":{"dose_kgha":2,"total_kg":${area*2},"fonte_sugerida":"Sulfato de zinco","parcelamento":"texto"},"B":{"dose_kgha":0.5,"total_kg":${area*0.5},"fonte_sugerida":"Bórax","parcelamento":"texto"}},"observacoes":[{"nivel":"critico","texto":"obs"},{"nivel":"alerta","texto":"obs"},{"nivel":"ok","texto":"obs"}]}
+Preencha diagnostico com todos os parâmetros analisados. Status: baixo, medio, adequado, alto, excesso. Valores reais baseados no IAC.`;
+
+  callAPI(prompt, data=>{
+    document.getElementById('btn-solo').disabled=false;
+    const res=JSON.parse(data.content[0].text.replace(/```json|```/g,'').trim());
+    renderSolo(res,area,cultura,prop,quad);
+  }, ()=>document.getElementById('btn-solo').disabled=false);
+}
+
+function renderSolo(res,area,cultura,prop,quad){
+  const bm={baixo:'bdg-baixo',medio:'bdg-medio',adequado:'bdg-adequado',alto:'bdg-alto',excesso:'bdg-excesso'};
+  const cal=res.calagem; const adub=res.adubacao;
+  setMain(`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem">
       <div>
-        <div style="font-size:13px;color:var(--text3);font-family:var(--mono)">Laudo gerado em ${new Date().toLocaleString('pt-BR')}</div>
-        <div style="font-size:18px;font-weight:600;color:var(--text);margin-top:.2rem">${prop} — ${quad}</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono)">${fmtDate()} · Boletim 100 IAC</div>
+        <div style="font-size:17px;font-weight:600">${prop} — ${quad} · ${cultura}</div>
       </div>
       <button class="btn-sec" onclick="window.print()">Imprimir / PDF</button>
     </div>
-    ${diagHTML}${calHTML}${adubHTML}${obsHTML}${notaHTML}`;
+    <div class="rcard">
+      <div class="rcard-title">Diagnóstico por parâmetro</div>
+      <table class="ptable">
+        <thead><tr><th>Parâmetro</th><th>Resultado</th><th>Status</th><th>Interpretação</th></tr></thead>
+        <tbody>${res.diagnostico.map(d=>`<tr><td style="font-weight:500">${d.parametro}</td><td style="font-family:var(--mono);font-size:11px">${d.valor??'nd'} ${d.unidade}</td><td><span class="bdg ${bm[d.status]||'bdg-medio'}">${d.status}</span></td><td style="font-size:11px;color:var(--text2)">${d.interpretacao}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+    <div class="rcard">
+      <div class="rcard-title">Necessidade de calagem</div>
+      ${cal.necessaria?`<table class="ctbl"><tr><td>Método</td><td>${cal.metodo}</td></tr><tr><td>V% alvo</td><td>${cal.vcalc}%</td></tr><tr><td>NC (t/ha)</td><td>${cal.ncal_tha}</td></tr><tr><td>NC total (${area} ha)</td><td>${Number(cal.ncal_total).toFixed(1)} t</td></tr><tr><td>PRNT referência</td><td>${cal.prnt_referencia}%</td></tr><tr><td>Produto sugerido</td><td>${cal.produto_sugerido}</td></tr></table><div class="cal-note">${cal.observacao}</div>`:'<div class="obs obs-o">Solo não requer calagem para esta cultura.</div>'}
+    </div>
+    <div class="rcard">
+      <div class="rcard-title">Adubação recomendada · ${area} ha</div>
+      ${Object.entries(adub).map(([el,v])=>`<div class="adub-item"><div class="adub-hdr"><span class="adub-el">${el}</span><span class="adub-dose">${v.dose_kgha} kg/ha · ${Number(v.total_kg).toFixed(0)} kg total</span></div><div class="adub-det">Fonte: ${v.fonte_sugerida} · ${v.parcelamento}</div></div>`).join('')}
+    </div>
+    <div class="rcard">
+      <div class="rcard-title">Observações agronômicas</div>
+      ${res.observacoes.map(o=>`<div class="obs ${o.nivel==='critico'?'obs-c':o.nivel==='alerta'?'obs-a':'obs-o'}">${o.texto}</div>`).join('')}
+    </div>
+    <div class="nota">Laudo gerado com base no Boletim 100 do IAC (Raij et al., 1997/2008). As recomendações devem ser validadas pelo engenheiro agrônomo responsável. RW Insumos e Consultoria · ${fmtDate()}</div>`);
 }
+
+// ============================================================
+// FOLIAR
+// ============================================================
+function interpretarFoliar(){
+  const key=apiKey(); if(!key){alert('Insira sua chave API.');return;}
+  const cultura=g('f-cultura'); if(!cultura){alert('Selecione a cultura.');return;}
+  if(!g('f-n')&&!g('f-p')){alert('Preencha ao menos N e P.');return;}
+  const prop=g('f-prop')||'Não informado'; const talh=g('f-talh')||'Amostra';
+  document.getElementById('btn-foliar').disabled=true; showLoading();
+
+  const dados={n:g('f-n'),p:g('f-p'),k:g('f-k'),ca:g('f-ca'),mg:g('f-mg'),s:g('f-s'),b:g('f-b'),cu:g('f-cu'),fe:g('f-fe'),mn:g('f-mn'),zn:g('f-zn'),mo:g('f-mo')};
+  const prompt=`Engenheiro agrônomo. Interprete análise foliar para ${cultura}, estádio: ${g('f-estadio')||'não informado'}. Use faixas de suficiência do IAC/literatura brasileira (Malavolta et al., Boletim 100 IAC). Propriedade: ${prop} — ${talh}.
+TEORES FOLIARES: N: ${dados.n} g/kg | P: ${dados.p} g/kg | K: ${dados.k} g/kg | Ca: ${dados.ca} g/kg | Mg: ${dados.mg} g/kg | S: ${dados.s} g/kg | B: ${dados.b} mg/kg | Cu: ${dados.cu} mg/kg | Fe: ${dados.fe} mg/kg | Mn: ${dados.mn} mg/kg | Zn: ${dados.zn} mg/kg | Mo: ${dados.mo} mg/kg
+Retorne SOMENTE JSON: {"cultura":"${cultura}","diagnostico":[{"nutriente":"N","teor":"${dados.n}","unidade":"g/kg","faixa_min":0,"faixa_max":0,"status":"deficiente","interpretacao":"texto"}],"correcao_foliar":[{"nutriente":"N","dose":"texto","produto":"texto","epoca":"texto","observacao":"texto"}],"observacoes":[{"nivel":"critico","texto":"texto"}]}
+Status válidos: deficiente, baixo, normal, alto, excessivo. Inclua todos os nutrientes analisados. Em correcao_foliar inclua apenas os que precisam de intervenção.`;
+
+  callAPI(prompt, data=>{
+    document.getElementById('btn-foliar').disabled=false;
+    const res=JSON.parse(data.content[0].text.replace(/```json|```/g,'').trim());
+    renderFoliar(res,prop,talh,cultura);
+  }, ()=>document.getElementById('btn-foliar').disabled=false);
+}
+
+function renderFoliar(res,prop,talh,cultura){
+  const bm={deficiente:'bdg-deficiente',baixo:'bdg-baixo',normal:'bdg-normal',alto:'bdg-alto',excessivo:'bdg-excessivo'};
+  setMain(`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem">
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono)">${fmtDate()} · Análise Foliar</div>
+        <div style="font-size:17px;font-weight:600">${prop} — ${talh} · ${cultura}</div>
+      </div>
+      <button class="btn-sec" onclick="window.print()">Imprimir / PDF</button>
+    </div>
+    <div class="rcard">
+      <div class="rcard-title">Diagnóstico foliar por nutriente</div>
+      <table class="ptable">
+        <thead><tr><th>Nutriente</th><th>Teor</th><th>Faixa adequada</th><th>Status</th><th>Interpretação</th></tr></thead>
+        <tbody>${res.diagnostico.map(d=>`<tr><td style="font-weight:500">${d.nutriente}</td><td style="font-family:var(--mono);font-size:11px">${d.teor??'nd'} ${d.unidade}</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${d.faixa_min}–${d.faixa_max} ${d.unidade}</td><td><span class="bdg ${bm[d.status]||'bdg-normal'}">${d.status}</span></td><td style="font-size:11px;color:var(--text2)">${d.interpretacao}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+    ${res.correcao_foliar&&res.correcao_foliar.length?`<div class="rcard"><div class="rcard-title">Correção foliar recomendada</div>${res.correcao_foliar.map(c=>`<div class="adub-item"><div class="adub-hdr"><span class="adub-el">${c.nutriente}</span><span class="adub-dose">${c.dose}</span></div><div class="adub-det">Produto: ${c.produto} · Época: ${c.epoca}</div>${c.observacao?`<div style="font-size:11px;color:var(--text3);margin-top:2px">${c.observacao}</div>`:''}</div>`).join('')}</div>`:''}
+    <div class="rcard"><div class="rcard-title">Observações</div>${res.observacoes.map(o=>`<div class="obs ${o.nivel==='critico'?'obs-c':o.nivel==='alerta'?'obs-a':'obs-o'}">${o.texto}</div>`).join('')}</div>
+    <div class="nota">Laudo foliar baseado em Malavolta et al. e Boletim 100 IAC. Validar com engenheiro agrônomo responsável. RW Insumos · ${fmtDate()}</div>`);
+}
+
+// ============================================================
+// DRIS
+// ============================================================
+function interpretarDRIS(){
+  const key=apiKey(); if(!key){alert('Insira sua chave API.');return;}
+  const cultura=g('d-cultura'); if(!cultura){alert('Selecione a cultura.');return;}
+  if(!g('d-n')&&!g('d-p')){alert('Preencha ao menos N e P.');return;}
+  const prop=g('d-prop')||'Não informado'; const talh=g('d-talh')||'Amostra';
+  document.getElementById('btn-dris').disabled=true; showLoading();
+
+  const dados={n:g('d-n'),p:g('d-p'),k:g('d-k'),ca:g('d-ca'),mg:g('d-mg'),s:g('d-s'),b:g('d-b'),cu:g('d-cu'),fe:g('d-fe'),mn:g('d-mn'),zn:g('d-zn'),mo:g('d-mo')};
+  const prompt=`Engenheiro agrônomo especialista em DRIS (Diagnosis and Recommendation Integrated System). Aplique o método DRIS para ${cultura}, produtividade ${g('d-prod')}. Use normas DRIS da literatura brasileira (Beaufils, Malavolta, IAC/Embrapa). Propriedade: ${prop} — ${talh}.
+TEORES FOLIARES: N: ${dados.n} g/kg | P: ${dados.p} g/kg | K: ${dados.k} g/kg | Ca: ${dados.ca} g/kg | Mg: ${dados.mg} g/kg | S: ${dados.s} g/kg | B: ${dados.b} mg/kg | Cu: ${dados.cu} mg/kg | Fe: ${dados.fe} mg/kg | Mn: ${dados.mn} mg/kg | Zn: ${dados.zn} mg/kg | Mo: ${dados.mo} mg/kg
+Calcule os índices DRIS para cada nutriente com base nas razões binárias e nas normas para ${cultura}. Determine o IBN (Índice de Balanço Nutricional) e a ordem de limitação.
+Retorne SOMENTE JSON: {"cultura":"${cultura}","ibn":0,"classificacao_ibn":"texto","indices":[{"nutriente":"N","indice":0,"status":"deficiente","ordem_limitacao":1}],"ordem_limitacao_deficiencia":["N","P"],"ordem_limitacao_excesso":["K"],"recomendacoes":[{"nutriente":"N","acao":"texto","dose_sugerida":"texto","produto":"texto"}],"observacoes":[{"nivel":"critico","texto":"texto"}]}
+Status dos índices: deficiente (índice < -10), levemente deficiente (-10 a -3), equilibrado (-3 a 3), levemente excessivo (3 a 10), excessivo (> 10). Ordem de limitação: 1 = mais limitante.`;
+
+  callAPI(prompt, data=>{
+    document.getElementById('btn-dris').disabled=false;
+    const res=JSON.parse(data.content[0].text.replace(/```json|```/g,'').trim());
+    renderDRIS(res,prop,talh,cultura);
+  }, ()=>document.getElementById('btn-dris').disabled=false);
+}
+
+function renderDRIS(res,prop,talh,cultura){
+  const statusColor={deficiente:'var(--red)','levemente deficiente':'var(--amber)',equilibrado:'var(--green)','levemente excessivo':'#856404',excessivo:'var(--purple)'};
+  const maxAbs=Math.max(...res.indices.map(i=>Math.abs(i.indice)),1);
+
+  const barsHTML=res.indices.sort((a,b)=>a.indice-b.indice).map(i=>{
+    const abs=Math.abs(i.indice); const pct=Math.min(abs/maxAbs*100,100);
+    const cor=statusColor[i.status]||'var(--text2)';
+    const lado=i.indice<0?'deficiência':'excesso';
+    return `<div style="margin-bottom:.6rem">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px">
+        <span style="font-weight:500">${i.nutriente} <span style="font-size:10px;color:var(--text3)">ordem ${i.ordem_limitacao||'—'}</span></span>
+        <span style="font-family:var(--mono);font-size:11px;color:${cor}">${i.indice>0?'+':''}${Number(i.indice).toFixed(1)} · ${i.status}</span>
+      </div>
+      <div class="dris-bar-bg">
+        <div class="dris-bar-fill" style="width:${pct}%;background:${cor};margin-left:${i.indice>=0?'50%':'calc(50% - '+pct/2+'%)'}"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const ibnColor=res.ibn<10?'var(--green)':res.ibn<20?'var(--amber)':'var(--red)';
+
+  setMain(`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem">
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono)">${fmtDate()} · DRIS — Diagnosis and Recommendation Integrated System</div>
+        <div style="font-size:17px;font-weight:600">${prop} — ${talh} · ${cultura}</div>
+      </div>
+      <button class="btn-sec" onclick="window.print()">Imprimir / PDF</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+      <div class="rcard" style="text-align:center">
+        <div class="rcard-title">IBN — Índice de Balanço Nutricional</div>
+        <div style="font-size:36px;font-weight:600;font-family:var(--mono);color:${ibnColor}">${Number(res.ibn).toFixed(1)}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:.25rem">${res.classificacao_ibn}</div>
+      </div>
+      <div class="rcard">
+        <div class="rcard-title">Ordem de limitação</div>
+        ${res.ordem_limitacao_deficiencia&&res.ordem_limitacao_deficiencia.length?`<div style="font-size:11px;color:var(--text3);margin-bottom:.3rem">Deficiência (mais → menos limitante)</div><div style="font-family:var(--mono);font-size:13px;color:var(--red);margin-bottom:.75rem">${res.ordem_limitacao_deficiencia.join(' › ')}</div>`:''}
+        ${res.ordem_limitacao_excesso&&res.ordem_limitacao_excesso.length?`<div style="font-size:11px;color:var(--text3);margin-bottom:.3rem">Excesso</div><div style="font-family:var(--mono);font-size:13px;color:var(--purple)">${res.ordem_limitacao_excesso.join(' › ')}</div>`:''}
+      </div>
+    </div>
+
+    <div class="rcard">
+      <div class="rcard-title">Índices DRIS por nutriente</div>
+      ${barsHTML}
+      <div style="font-size:10px;color:var(--text3);margin-top:.5rem;font-family:var(--mono)">Linha central = zero (equilíbrio) · Esquerda = deficiência · Direita = excesso</div>
+    </div>
+
+    ${res.recomendacoes&&res.recomendacoes.length?`<div class="rcard"><div class="rcard-title">Recomendações de correção</div>${res.recomendacoes.map(r=>`<div class="adub-item"><div class="adub-hdr"><span class="adub-el">${r.nutriente}</span><span class="adub-dose">${r.dose_sugerida||''}</span></div><div class="adub-det">${r.acao}${r.produto?' · Produto: '+r.produto:''}</div></div>`).join('')}</div>`:''}
+
+    <div class="rcard"><div class="rcard-title">Observações</div>${res.observacoes.map(o=>`<div class="obs ${o.nivel==='critico'?'obs-c':o.nivel==='alerta'?'obs-a':'obs-o'}">${o.texto}</div>`).join('')}</div>
+    <div class="nota">DRIS calculado com base nas normas de Beaufils (1973) adaptadas por Malavolta et al. e literatura IAC/Embrapa para ${cultura}. Os índices são relativos — validar com agrônomo responsável. RW Insumos · ${fmtDate()}</div>`);
+}
+
+// ============================================================
+// API CALL
+// ============================================================
+function callAPI(prompt, onSuccess, onError){
+  const key=apiKey();
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-client-side-allow-unsafe':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:'Responda APENAS com JSON válido. Sem markdown, sem texto fora do JSON, sem vírgula final.',messages:[{role:'user',content:prompt}]})
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    if(data.error){setMain(`<div class="empty"><p>Erro API: ${data.error.message}</p></div>`);if(onError)onError();return;}
+    onSuccess(data);
+  })
+  .catch(e=>{
+    setMain(`<div class="empty"><p>Erro de conexão: ${e.message}<br><br>Verifique sua chave API e a conexão com a internet.</p></div>`);
+    if(onError)onError();
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderSidebar('solo');
 </script>
 </body>
 </html>
