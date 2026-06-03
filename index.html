@@ -348,14 +348,35 @@ function renderSidebar(m){
 }
 
 // ============================================================
-// PDF HANDLING — envia como base64 para Claude extrair
+// PDF HANDLING — extrai texto via pdf.js no navegador, envia texto à API
 // ============================================================
-async function pdfToBase64(file){
-  return new Promise((res,rej)=>{
-    const r=new FileReader();
-    r.onload=()=>res(r.result.split(',')[1]);
-    r.onerror=rej;
-    r.readAsDataURL(file);
+let _pdfjs_ready = false;
+function loadPdfJs(cb){
+  if(_pdfjs_ready){cb();return;}
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+  s.onload=()=>{
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    _pdfjs_ready=true; cb();
+  };
+  document.head.appendChild(s);
+}
+
+async function extractPdfText(file){
+  return new Promise((resolve,reject)=>{
+    loadPdfJs(async()=>{
+      try{
+        const ab=await file.arrayBuffer();
+        const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+        let text='';
+        for(let i=1;i<=Math.min(pdf.numPages,6);i++){
+          const page=await pdf.getPage(i);
+          const tc=await page.getTextContent();
+          text+=tc.items.map(x=>x.str).join(' ')+'\n';
+        }
+        resolve(text);
+      }catch(e){reject(e);}
+    });
   });
 }
 
@@ -364,28 +385,26 @@ async function handlePDF(input){
   const key=apiKey();
   if(!key){alert('Insira sua chave API primeiro.');return;}
   const st=document.getElementById('upload-status');
-  st.style.display='block'; st.textContent='Lendo PDF...';
+  st.style.display='block'; st.textContent='Extraindo texto do PDF...';
   try{
-    const b64=await pdfToBase64(file);
+    const texto=await extractPdfText(file);
+    st.textContent='Enviando para interpretação...';
     const resp=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-client-side-allow-unsafe':'true'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',max_tokens:800,
-        system:'Extraia dados de análise de solo deste relatório de laboratório. Retorne SOMENTE JSON válido sem markdown.',
-        messages:[{role:'user',content:[
-          {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
-          {type:'text',text:'Extraia todos os valores desta análise de solo. Retorne JSON: {"prop":"nome da propriedade","quad":"identificação da quadra/amostra","ph":0,"phsmp":0,"v":0,"al":0,"actt":0,"satal":0,"ca":0,"mg":0,"k":0,"ctc":0,"sb":0,"p":0,"mo":0,"s":0,"zn":0,"b":0,"cu":0,"mn":0,"fe":0}. Use null para valores não encontrados.'}
-        ]}]
+        system:'Extraia dados de análise de solo do texto de laboratório. Retorne SOMENTE JSON válido sem markdown.',
+        messages:[{role:'user',content:'Extraia todos os valores desta análise de solo. Texto:\n\n'+texto+'\n\nRetorne JSON: {"prop":"nome da propriedade","quad":"identificação da quadra/amostra","ph":null,"phsmp":null,"v":null,"al":null,"actt":null,"satal":null,"ca":null,"mg":null,"k":null,"ctc":null,"sb":null,"p":null,"mo":null,"s":null,"zn":null,"b":null,"cu":null,"mn":null,"fe":null}. Use null para não encontrados.'}]
       })
     });
     const data=await resp.json();
-    if(data.error){st.textContent='Erro: '+data.error.message;return;}
+    if(data.error){st.textContent='Erro API: '+data.error.message;return;}
     const raw=data.content[0].text.replace(/```json|```/g,'').trim();
     const vals=JSON.parse(raw);
     preencherSolo(vals);
-    st.textContent='✓ PDF lido — '+file.name;
-  }catch(e){st.textContent='Erro ao ler PDF: '+e.message;}
+    st.textContent='✓ PDF lido com sucesso — '+file.name;
+  }catch(e){st.textContent='Erro: '+e.message;}
 }
 
 function preencherSolo(v){
@@ -401,23 +420,21 @@ async function handlePDFFoliar(input){
   const key=apiKey();
   if(!key){alert('Insira sua chave API primeiro.');return;}
   const st=document.getElementById('upload-status-foliar');
-  st.style.display='block'; st.textContent='Lendo PDF foliar...';
+  st.style.display='block'; st.textContent='Extraindo texto do PDF foliar...';
   try{
-    const b64=await pdfToBase64(file);
+    const texto=await extractPdfText(file);
+    st.textContent='Enviando para interpretação...';
     const resp=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-client-side-allow-unsafe':'true'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',max_tokens:600,
-        system:'Extraia dados de análise foliar. Retorne SOMENTE JSON válido sem markdown.',
-        messages:[{role:'user',content:[
-          {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
-          {type:'text',text:'Extraia os teores foliares. Retorne JSON: {"prop":"","talh":"","cultura":"","estadio":"","n":0,"p":0,"k":0,"ca":0,"mg":0,"s":0,"b":0,"cu":0,"fe":0,"mn":0,"zn":0,"mo":0}. N,P,K,Ca,Mg,S em g/kg; micro em mg/kg. null para não encontrados.'}
-        ]}]
+        system:'Extraia dados de análise foliar do texto. Retorne SOMENTE JSON válido sem markdown.',
+        messages:[{role:'user',content:'Extraia os teores foliares. Texto:\n\n'+texto+'\n\nRetorne JSON: {"prop":"","talh":"","cultura":"","estadio":"","n":null,"p":null,"k":null,"ca":null,"mg":null,"s":null,"b":null,"cu":null,"fe":null,"mn":null,"zn":null,"mo":null}. N,P,K,Ca,Mg,S em g/kg; micro em mg/kg. null para não encontrados.'}]
       })
     });
     const data=await resp.json();
-    if(data.error){st.textContent='Erro: '+data.error.message;return;}
+    if(data.error){st.textContent='Erro API: '+data.error.message;return;}
     const raw=data.content[0].text.replace(/```json|```/g,'').trim();
     const vals=JSON.parse(raw);
     preencherFoliar(vals);
@@ -438,23 +455,21 @@ async function handlePDFDris(input){
   const key=apiKey();
   if(!key){alert('Insira sua chave API primeiro.');return;}
   const st=document.getElementById('upload-status-dris');
-  st.style.display='block'; st.textContent='Lendo PDF para DRIS...';
+  st.style.display='block'; st.textContent='Extraindo texto do PDF para DRIS...';
   try{
-    const b64=await pdfToBase64(file);
+    const texto=await extractPdfText(file);
+    st.textContent='Enviando para interpretação...';
     const resp=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-client-side-allow-unsafe':'true'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',max_tokens:600,
-        system:'Extraia dados de análise foliar para DRIS. Retorne SOMENTE JSON válido.',
-        messages:[{role:'user',content:[
-          {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
-          {type:'text',text:'Extraia os teores foliares. Retorne JSON: {"prop":"","talh":"","cultura":"","n":0,"p":0,"k":0,"ca":0,"mg":0,"s":0,"b":0,"cu":0,"fe":0,"mn":0,"zn":0,"mo":0}. N,P,K,Ca,Mg,S em g/kg; micro em mg/kg. null para não encontrados.'}
-        ]}]
+        system:'Extraia dados de análise foliar para DRIS do texto. Retorne SOMENTE JSON válido.',
+        messages:[{role:'user',content:'Extraia os teores foliares. Texto:\n\n'+texto+'\n\nRetorne JSON: {"prop":"","talh":"","cultura":"","n":null,"p":null,"k":null,"ca":null,"mg":null,"s":null,"b":null,"cu":null,"fe":null,"mn":null,"zn":null,"mo":null}. N,P,K,Ca,Mg,S em g/kg; micro em mg/kg. null para não encontrados.'}]
       })
     });
     const data=await resp.json();
-    if(data.error){st.textContent='Erro: '+data.error.message;return;}
+    if(data.error){st.textContent='Erro API: '+data.error.message;return;}
     const raw=data.content[0].text.replace(/```json|```/g,'').trim();
     const vals=JSON.parse(raw);
     preencherDris(vals);
